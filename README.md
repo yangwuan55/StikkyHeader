@@ -1,6 +1,8 @@
 StikkyHeader
 ============
 
+add the 2.3 supported.
+
 This is a very simple library for Android that allows you to stick an header to a ListView and easily apply animation to it
 
 ## Usage
