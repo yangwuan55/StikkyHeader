@@ -5,6 +5,7 @@ import android.graphics.Rect;
 import android.view.View;
 import android.view.animation.Interpolator;
 import android.view.animation.LinearInterpolator;
+import com.nineoldandroids.view.ViewHelper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,13 +13,16 @@ import java.util.List;
 public class AnimatorBuilder {
 
     public static final float DEFAULT_VELOCITY_PARALLAX = 0.5f;
+    private static final String TAG = "AnimatorBuilder";
 
     private List<AnimatorBundle> mListAnimatorBundles;
 
     private float mLastTranslationApplied = Float.NaN;
 
+    private float mStartBoundedRatioTranslationY = 0.0f;
+
     public AnimatorBuilder() {
-        mListAnimatorBundles = new ArrayList<>(2);
+        mListAnimatorBundles = new ArrayList<AnimatorBundle>(2);
     }
 
     public static AnimatorBuilder create() {
@@ -181,7 +185,7 @@ public class AnimatorBuilder {
         }
     }
 
-    protected void animateOnScroll(final float boundedRatioTranslationY, final float translationY) {
+    protected void animateOnScroll(float boundedRatioTranslationY, final float translationY) {
 
         if (mLastTranslationApplied == boundedRatioTranslationY) {
             return;
@@ -189,26 +193,39 @@ public class AnimatorBuilder {
 
         mLastTranslationApplied = boundedRatioTranslationY;
 
-        for (AnimatorBuilder.AnimatorBundle animatorBundle : mListAnimatorBundles) {
+        for (AnimatorBundle animatorBundle : mListAnimatorBundles) {
+            switch (animatorBundle.mTypeAnimation) {
+                case TRANSLATION:
+                    ViewHelper.setTranslationX(animatorBundle.mView, (Float) animatorBundle.mValues[0] * animatorBundle.mInterpolator.getInterpolation(boundedRatioTranslationY));
+                    ViewHelper.setTranslationY(animatorBundle.mView, ((Float) animatorBundle.mValues[1] * animatorBundle.mInterpolator.getInterpolation(boundedRatioTranslationY)) - translationY);
+                    break;
+
+                default:
+                    break;
+            }
+        }
+
+        if (boundedRatioTranslationY >= mStartBoundedRatioTranslationY) {
+            boundedRatioTranslationY = (boundedRatioTranslationY - mStartBoundedRatioTranslationY) / (1.0f - mStartBoundedRatioTranslationY);
+        } else {
+            boundedRatioTranslationY = 0.0f;
+        }
+
+        for (AnimatorBundle animatorBundle : mListAnimatorBundles) {
 
             switch (animatorBundle.mTypeAnimation) {
 
                 case FADE:
-                    animatorBundle.mView.setAlpha((((Float) animatorBundle.mValues[1] - (Float) animatorBundle.mValues[0]) * animatorBundle.mInterpolator.getInterpolation(boundedRatioTranslationY)) + (Float) animatorBundle.mValues[0]); //TODO performance issues?
-                    break;
-
-                case TRANSLATION:
-                    animatorBundle.mView.setTranslationX((Float) animatorBundle.mValues[0] * animatorBundle.mInterpolator.getInterpolation(boundedRatioTranslationY));
-                    animatorBundle.mView.setTranslationY(((Float) animatorBundle.mValues[1] * animatorBundle.mInterpolator.getInterpolation(boundedRatioTranslationY)) - translationY);
+                    ViewHelper.setAlpha(animatorBundle.mView, (((Float) animatorBundle.mValues[1] - (Float) animatorBundle.mValues[0]) * animatorBundle.mInterpolator.getInterpolation(boundedRatioTranslationY)) + (Float) animatorBundle.mValues[0]);//TODO performance issues?
                     break;
 
                 case SCALE:
-                    animatorBundle.mView.setScaleX(1f - (Float) animatorBundle.mValues[0] * animatorBundle.mInterpolator.getInterpolation(boundedRatioTranslationY));
-                    animatorBundle.mView.setScaleY(1f - (Float) animatorBundle.mValues[1] * animatorBundle.mInterpolator.getInterpolation(boundedRatioTranslationY));
+                    ViewHelper.setScaleX(animatorBundle.mView, 1f - (Float) animatorBundle.mValues[0] * animatorBundle.mInterpolator.getInterpolation(boundedRatioTranslationY));
+                    ViewHelper.setScaleY(animatorBundle.mView, 1f - (Float) animatorBundle.mValues[1] * animatorBundle.mInterpolator.getInterpolation(boundedRatioTranslationY));
                     break;
 
                 case PARALLAX:
-                    animatorBundle.mView.setTranslationY((Float) animatorBundle.mValues[0] * translationY);
+                    ViewHelper.setTranslationY(animatorBundle.mView, (Float) animatorBundle.mValues[0] * translationY);
                     break;
 
                 default:
@@ -217,7 +234,6 @@ public class AnimatorBuilder {
             }
 
         }
-
     }
 
     public boolean hasAnimatorBundles() {
@@ -264,7 +280,7 @@ public class AnimatorBuilder {
             mTypeAnimation = typeAnimation;
         }
 
-        public static AnimatorBundle create(final AnimatorBundle.TypeAnimation typeAnimation, final View view, final Interpolator interpolator, final Object... values) {
+        public static AnimatorBundle create(final TypeAnimation typeAnimation, final View view, final Interpolator interpolator, final Object... values) {
             AnimatorBundle animatorBundle = new AnimatorBundle(typeAnimation);
 
             animatorBundle.mView = view;
@@ -280,5 +296,12 @@ public class AnimatorBuilder {
 
     }
 
+    public float getStartBoundedRatioTranslationY() {
+        return mStartBoundedRatioTranslationY;
+    }
+
+    public void setStartBoundedRatioTranslationY(float startBoundedRatioTranslationY) {
+        this.mStartBoundedRatioTranslationY = startBoundedRatioTranslationY;
+    }
 
 }

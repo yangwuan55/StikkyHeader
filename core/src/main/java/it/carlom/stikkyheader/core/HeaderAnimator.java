@@ -13,7 +13,7 @@ public abstract class HeaderAnimator {
     public abstract void onScroll(final int scrolledY);
 
     /**
-     * Called by the {@link it.carlom.stikkyheader.core.StikkyHeader} to set the {@link HeaderAnimator} up
+     * Called by the {@link StikkyHeader} to set the {@link HeaderAnimator} up
      */
     void setupAnimator(final View header, final int minHeightHeader, final int heightHeader, final int maxTransaction) {
         this.mHeader = header;

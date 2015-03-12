@@ -1,7 +1,7 @@
 apply plugin: 'com.android.library'
 android {
     compileSdkVersion 21
-    buildToolsVersion "21.1.2"
+    buildToolsVersion "20"
 
     defaultConfig {
         minSdkVersion 14
@@ -11,6 +11,7 @@ android {
 
 dependencies {
     compile 'com.android.support:recyclerview-v7:21.0.3'
+    compile 'com.nineoldandroids:library:2.4.0'
 }
 
 apply from: 'https://raw.github.com/chrisbanes/gradle-mvn-push/master/gradle-mvn-push.gradle'

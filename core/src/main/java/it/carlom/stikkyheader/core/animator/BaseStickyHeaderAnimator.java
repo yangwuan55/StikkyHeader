@@ -1,7 +1,8 @@
 package it.carlom.stikkyheader.core.animator;
 
-import it.carlom.stikkyheader.core.HeaderAnimator;
 
+import com.lexue.courser.view.widget.stikkyheader.HeaderAnimator;
+import com.nineoldandroids.view.ViewHelper;
 
 public class BaseStickyHeaderAnimator extends HeaderAnimator {
 
@@ -20,7 +21,7 @@ public class BaseStickyHeaderAnimator extends HeaderAnimator {
     @Override
     public void onScroll(int scrolledY) {
 
-        getHeader().setTranslationY(Math.max(scrolledY, getMaxTransaction()));
+        ViewHelper.setTranslationY(getHeader(),Math.max(scrolledY, getMaxTransaction()));
 
         mTransactionRatio = calculateTransactionRatio(scrolledY);
     }

@@ -9,8 +9,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
 import android.widget.ScrollView;
+import com.lexue.courser.view.widget.stikkyheader.animator.HeaderStikkyAnimator;
 
-import it.carlom.stikkyheader.core.animator.HeaderStikkyAnimator;
 
 public abstract class StikkyHeaderBuilder {
 
